@@ -35,12 +35,12 @@ async function showJson(raw) {
   try {
     const parsed = JSON.parse(raw);
 
-    if (window.processStats) {
-      const processed = window.processStats(parsed);
-      el.innerHTML = highlight(processed);
-    } else {
+    //if (window.processStats) {
+      //const processed = window.processStats(parsed);
+      //el.innerHTML = highlight(processed);
+    //} else {
       el.innerHTML = highlight(parsed);
-    }
+    //}
   } catch {
     el.textContent = raw;
   }

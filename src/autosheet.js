@@ -52,6 +52,7 @@ function processStats(stats) {
       stats.BottomLine,
       stats.CollectedTotal,
       stats.BottomLineTrue,
+      stats.TakeOffTime,
       stats.HazardInfo.TurretCount,
       stats.HazardInfo.LandmineCount,
       stats.HazardInfo.SpiketrapCount,
