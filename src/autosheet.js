@@ -40,6 +40,7 @@ function processStats(stats) {
       stats.MoonInfo.Weather,
       stats.DungeonInfo.Interior,
       stats.DungeonInfo.ItemCount,
+      stats.MissedItems.recude((a, b) => (b.CollectedOnPreviousDay) ? a : a + 1, 0),
       stats.AppSpawned,
       stats.BeeInfo.Values.length,
       stats.BeeInfo.Values.reduce((a, b) => a + b, 0),
