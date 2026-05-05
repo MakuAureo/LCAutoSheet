@@ -14,3 +14,8 @@ const START_COLUMN = "D"; //There has to be at least 24 columns of empty space t
 const QUOTA_COLUMN = "B";
 const SELL_COLUMN = "AB";
 ```
+
+# Running LCAutoSheet
+
+Any http server runner will work, but by far the simplest is running this python command on this directory
+```python -m http.server port```
