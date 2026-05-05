@@ -3,7 +3,7 @@ let running = false;
 
 (function loadBackground() {
   const img = new Image();
-  img.src = "bg.png";
+  img.src = "imgs/bg.png";
 
   img.onload = () => {
     document.body.style.backgroundImage = `url(${img.src})`;
