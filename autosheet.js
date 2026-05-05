@@ -91,47 +91,30 @@ async function writeCells(token, startWritePos, cellMat) {
   );
 }
 
-async function fetchAndWrite() {
-  while (true) {
-    document.getElementById("status").textContent = "Waiting for day to end...";
-
-    await new Promise((resolve) => {
-      const source = new EventSource("http://localhost:2145");
-      source.onmessage = async (e) => {
-        source.close();
-
-        document.getElementById("status").textContent = "Reading data...";
-        const stats = JSON.parse(e.data);
-        const row = processStats(stats);
-        document.getElementById("status").textContent = "Getting Google OAuth...";
-        const token = await getToken();
-        document.getElementById("status").textContent = "Submitting data to sheet...";
-        switch (row.length) {
-          case 1:
-            const currentSellCount = await getFirstEmptyRowInColomn(token, SELL_COLUMN) - 1;
-            if (currentSellCount == 0) {
-              await writeCells(token, `${SELL_COLUMN}2`, [[ row[0] ]]);
-              break;
-            }
-            const sellCell = await readCells(token, `${SELL_COLUMN}${3*currentSellCount - 1}`);
-            const sellAmount = Number(sellCell.values?.[0]?.[0] ?? 0);
-            writeCells(token, `${SELL_COLUMN}${3*currentSellCount - 1}`, [[ row[0] + sellAmount ]]);
-            break;
-          case 2:
-            const currentQuotaCount = await getFirstEmptyRowInColomn(token, QUOTA_COLUMN) - 1;
-            const sellThisQuotaCell = await readCells(token, `${SELL_COLUMN}${3*currentQuotaCount-4}`);
-            const sellThisQuotaAmount = Number(sellThisQuotaCell.values?.[0]?.[0] ?? 0);
-            await writeCells(token, `${SELL_COLUMN}${3*currentQuotaCount-4}`, [[ row[1] + sellThisQuotaAmount ]])
-            await writeCells(token, `${SELL_COLUMN}${3*currentQuotaCount-1}`, [[ row[0] ]])
-            break;
-          default:
-            const firstEmptyRow = await getFirstEmptyRowInColomn(token, START_COLUMN);
-            await writeCells(token, `${START_COLUMN}${firstEmptyRow}`, [ row ])
-            break
-        }
-        document.getElementById("status").textContent = "SpreadSheet Updated";
-        resolve();
-      };
-    });
+async function fetchAndWrite(jsonData) {
+  const row = processStats(jsonData);
+  const token = await getToken();
+  switch (row.length) {
+    case 1:
+      const currentSellCount = await getFirstEmptyRowInColomn(token, SELL_COLUMN) - 1;
+      if (currentSellCount == 0) {
+        await writeCells(token, `${SELL_COLUMN}2`, [[ row[0] ]]);
+        break;
+      }
+      const sellCell = await readCells(token, `${SELL_COLUMN}${3*currentSellCount - 1}`);
+      const sellAmount = Number(sellCell.values?.[0]?.[0] ?? 0);
+      writeCells(token, `${SELL_COLUMN}${3*currentSellCount - 1}`, [[ row[0] + sellAmount ]]);
+      break;
+    case 2:
+      const currentQuotaCount = await getFirstEmptyRowInColomn(token, QUOTA_COLUMN) - 1;
+      const sellThisQuotaCell = await readCells(token, `${SELL_COLUMN}${3*currentQuotaCount-4}`);
+      const sellThisQuotaAmount = Number(sellThisQuotaCell.values?.[0]?.[0] ?? 0);
+      await writeCells(token, `${SELL_COLUMN}${3*currentQuotaCount-4}`, [[ row[1] + sellThisQuotaAmount ]])
+      await writeCells(token, `${SELL_COLUMN}${3*currentQuotaCount-1}`, [[ row[0] ]])
+      break;
+    default:
+      const firstEmptyRow = await getFirstEmptyRowInColomn(token, START_COLUMN);
+      await writeCells(token, `${START_COLUMN}${firstEmptyRow}`, [ row ])
+      break
   }
 }
