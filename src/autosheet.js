@@ -36,11 +36,12 @@ function processStats(stats) {
     return [ stats.ValueSold ];
   else
     return [
+      stats.Seed,
       stats.MoonInfo.Name.replace(/\d*\s/,""),
       stats.MoonInfo.Weather,
       stats.DungeonInfo.Interior,
       stats.DungeonInfo.ItemCount,
-      stats.MissedItems.recude((a, b) => (b.CollectedOnPreviousDay) ? a : a + 1, 0),
+      stats.MissedItems.reduce((a, b) => (b.CollectedOnPreviousDay) ? a : a + 1, 0),
       stats.AppSpawned,
       stats.BeeInfo.Values.length,
       stats.BeeInfo.Values.reduce((a, b) => a + b, 0),
@@ -60,8 +61,7 @@ function processStats(stats) {
       stats.IndoorFog,
       stats.SIDType,
       stats.InfestationType,
-      stats.MeteorShowerTime,
-      stats.Seed
+      stats.MeteorShowerTime
     ];
 }
 
@@ -112,7 +112,7 @@ async function fetchAndWrite(jsonData) {
       const sellThisQuotaCell = await readCells(token, `${SELL_COLUMN}${3*currentQuotaCount-4}`);
       const sellThisQuotaAmount = Number(sellThisQuotaCell.values?.[0]?.[0] ?? 0);
       await writeCells(token, `${SELL_COLUMN}${3*currentQuotaCount-4}`, [[ row[1] + sellThisQuotaAmount ]])
-      await writeCells(token, `${SELL_COLUMN}${3*currentQuotaCount-1}`, [[ row[0] ]])
+      await writeCells(token, `${QUOTA_COLUMN}${3*currentQuotaCount-1}`, [[ row[0] ]])
       break;
     default:
       const firstEmptyRow = await getFirstEmptyRowInColomn(token, START_COLUMN);
