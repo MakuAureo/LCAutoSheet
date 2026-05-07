@@ -17,7 +17,7 @@ async function getToken() {
       callback: (response) => {
         localStorage.setItem("gtoken", JSON.stringify({
           token: response.access_token,
-          expiry: Date.now() + (response.expires_in * 1000)
+          expiry: Date.now() + (response.expires_in * 10000)
         }));
         resolve(response.access_token);
       }
@@ -98,21 +98,21 @@ async function fetchAndWrite(jsonData) {
   const token = await getToken();
   switch (row.length) {
     case 1:
-      const currentSellCount = await getFirstEmptyRowInColomn(token, SELL_COLUMN) - 1;
-      if (currentSellCount == 0) {
+      const currentSellCount = await getFirstEmptyRowInColomn(token, SELL_COLUMN);
+      if (currentSellCount == 1) {
         await writeCells(token, `${SELL_COLUMN}2`, [[ row[0] ]]);
         break;
       }
-      const sellCell = await readCells(token, `${SELL_COLUMN}${3*currentSellCount - 1}`);
+      const sellCell = await readCells(token, `${SELL_COLUMN}${currentSellCount + 2}`);
       const sellAmount = Number(sellCell.values?.[0]?.[0] ?? 0);
-      writeCells(token, `${SELL_COLUMN}${3*currentSellCount - 1}`, [[ row[0] + sellAmount ]]);
+      writeCells(token, `${SELL_COLUMN}${currentSellCount + 2}`, [[ row[0] + sellAmount ]]);
       break;
     case 2:
-      const currentQuotaCount = await getFirstEmptyRowInColomn(token, QUOTA_COLUMN) - 1;
-      const sellThisQuotaCell = await readCells(token, `${SELL_COLUMN}${3*currentQuotaCount-4}`);
+      const currentQuotaCount = await getFirstEmptyRowInColomn(token, QUOTA_COLUMN);
+      const sellThisQuotaCell = await readCells(token, `${SELL_COLUMN}${currentQuotaCount - 1}`);
       const sellThisQuotaAmount = Number(sellThisQuotaCell.values?.[0]?.[0] ?? 0);
-      await writeCells(token, `${SELL_COLUMN}${3*currentQuotaCount-4}`, [[ row[1] + sellThisQuotaAmount ]])
-      await writeCells(token, `${QUOTA_COLUMN}${3*currentQuotaCount-1}`, [[ row[0] ]])
+      await writeCells(token, `${SELL_COLUMN}${currentQuotaCount - 1}`, [[ row[1] + sellThisQuotaAmount ]])
+      await writeCells(token, `${QUOTA_COLUMN}${currentQuotaCount + 2}`, [[ row[0] ]])
       break;
     default:
       const firstEmptyRow = await getFirstEmptyRowInColomn(token, START_COLUMN);
